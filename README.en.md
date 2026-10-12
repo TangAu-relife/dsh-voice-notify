@@ -22,6 +22,30 @@ and needs no third-party audio dependency.
 
 ## Install
 
+Grab the files first (Option A or B), then run `install.ps1` (mode 1 or 2 below).
+
+### Option A · From the Release zip (no git needed)
+
+1. Grab `dsh-voice-notify-<version>.zip` from [Releases](https://github.com/TangAu-relife/dsh-voice-notify/releases)
+2. Extract it — the archive contains one `dsh-plugin-voice-notify\` folder that is **ready to install as-is**
+3. Run one line inside that folder:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+If Windows marked the downloaded script as "from the Internet", run `Get-ChildItem -Recurse -File | Unblock-File` first
+(or just keep the `-ExecutionPolicy Bypass` above).
+
+After installing, **refresh the settings page once**: the section appears under **Settings → 语音提醒**
+("Voice notifications"). From then on the plugin announces every finished turn automatically — nothing else to trigger.
+
+> The zip carries everything needed at runtime: code + 20 built-in clips + `install.ps1` + the MIT license.
+> CI config, the English README and the screenshot live in the repository only and do not affect usage.
+
+---
+### Option B · From source (git clone)
+
 ```powershell
 git clone https://github.com/TangAu-relife/dsh-voice-notify.git
 cd dsh-voice-notify
@@ -30,7 +54,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1        # guard
 powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Mode roster
 ```
 
-Uninstall: `.\install.ps1 -Uninstall` (add `-Purge` to also delete the deployed copies).
+Mount mode is chosen by the same script: the default is a **guardian hot-mount** (applies immediately);
+`-Mode roster` writes the package into the profile's `dependencies` + `dsh.profile.bundles` instead
+(**needs a DSH restart**). Uninstall: `.\install.ps1 -Uninstall` (add `-Purge` to also delete the deployed copies).
 
 Useful switches: `-Hot` (new package name + hot re-mount, for code changes), `-Profile <name>`, `-DshHome <path>`, `-Port <n>`.
 

@@ -40,28 +40,41 @@
 
 ---
 
-## 从 GitHub 安装
+## 安装
+
+先拿到文件（方式 A 或 B），再跑 `install.ps1`（挂载方式一 或 方式二）。
+
+### 方式 A · 下载 Release 的 zip（不用装 git）
+
+1. 去 [Releases](https://github.com/TangAu-relife/dsh-voice-notify/releases) 下载 `dsh-voice-notify-<版本>.zip`
+2. 解压 —— 里面是一个 `dsh-plugin-voice-notify\` 文件夹，**已经是可直接安装的成品包**
+3. 进这个文件夹跑一行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+如果 Windows 给下载来的脚本打了「来自 Internet」标记，先 `Get-ChildItem -Recurse -File | Unblock-File` 再跑（或者就用上面的 `-ExecutionPolicy Bypass`）。
+
+装完**刷新一次设置页**，「设置 → 语音提醒」那一栏就出现了；之后**每轮对话真正收尾时自动播报**，不需要再做任何手工操作。
+
+> zip 里是运行所需的全部内容：代码 + 20 条内置语音 + `install.ps1` + MIT 许可证。
+> CI 配置、英文 README、界面截图只放在仓库里，不影响使用。
+
+### 方式 B · 从源码安装（git clone）
 
 ```powershell
 git clone https://github.com/TangAu-relife/dsh-voice-notify.git
 cd dsh-voice-notify
-powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1        # guardian 模式（推荐）
-# 或者
-powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Mode roster
 ```
-
-卸载：`.\install.ps1 -Uninstall`（加 `-Purge` 连落地副本一起删）。
 
 **要求**：Windows + PowerShell 5.1+、已装 DSH。放音走 .NET `SoundPlayer`（winmm），
 目前只支持 Windows —— 非 Windows 平台上插件会打印一条警告并静默停用。
 
 要自己重新合成语音，工作区里配套的 `speak.ps1`（在线 edge-tts，失败回退离线 piper）
-不是本仓库的一部分，见仓库 README 的「换成你自己的语音」。
+不是本仓库的一部分，见下面「换成你自己的语音」。
 
----
-## 安装
-
-### 方式一：守护热挂载（本机 desktop profile 正在用）
+### 挂载方式一 · 守护热挂载（推荐，立即生效）
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1        # 首次安装：立即生效
@@ -76,7 +89,7 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1 -Hot   # 改了代码：�
 4. 通过守护自己的接口 `POST /guardian/api/staged` **热挂载**，成功即转正
    （写进 `$DSH_HOME/guardian/state.json` 的 `promoted`，以后每次启动自动恢复）。
 
-### 方式二：正式名册（profile 里没有守护插件时）
+### 挂载方式二 · 正式名册（需要重启 DSH）
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1 -Mode roster
