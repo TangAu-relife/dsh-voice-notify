@@ -1,0 +1,94 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: 静态检查
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: JS 语法（宿主半侧 + 浏览器半侧）
+        shell: pwsh
+        run: |
+          node --check lib/index.js
+          node --check lib/client.js
+          Write-Host 'JS 语法通过'
+
+      - name: 内置语音与 CLIPS 声明一一对应
+        shell: pwsh
+        run: |
+          $src = Get-Content lib/index.js -Raw -Encoding UTF8
+          $ids = [regex]::Matches($src, "id: '(done-\d+)'") | ForEach-Object { $_.Groups[1].Value }
+          if ($ids.Count -eq 0) { throw 'CLIPS 里没解析到任何 done-N 条目' }
+          $missing = @()
+          foreach ($id in $ids) { if (-not (Test-Path "assets/$id.wav")) { $missing += $id } }
+          if ($missing.Count) { throw "assets 里缺: $($missing -join ', ')" }
+          Write-Host "CLIPS $($ids.Count) 条，assets 全部存在"
+
+      - name: PowerShell 语法
+        shell: pwsh
+        run: |
+          $bad = 0
+          foreach ($f in Get-ChildItem -Recurse -Filter *.ps1) {
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$null, [ref]$errors)
+            if ($errors.Count) {
+              foreach ($e in $errors) { Write-Host "::error file=$($f.Name)::$($e.Message)" }
+              $bad++
+            }
+          }
+          if ($bad) { throw "$bad 个脚本有语法错误" }
+          Write-Host 'PowerShell 语法全部通过'
+
+      - name: .ps1 必须带 BOM（Windows PowerShell 5.1 解析中文的要求）
+        shell: pwsh
+        run: |
+          $bad = @()
+          foreach ($f in Get-ChildItem -Recurse -Filter *.ps1) {
+            $b = [System.IO.File]::ReadAllBytes($f.FullName)
+            if ($b.Length -lt 3 -or $b[0] -ne 0xEF -or $b[1] -ne 0xBB -or $b[2] -ne 0xBF) { $bad += $f.Name }
+          }
+          if ($bad.Count) { throw ("这些 .ps1 缺 BOM: " + ($bad -join ', ')) }
+          Write-Host 'BOM 检查通过'
+
+      - name: package.json 契约（宿主 + 浏览器半侧声明）
+        shell: pwsh
+        run: |
+          $pkg = Get-Content package.json -Raw -Encoding UTF8 | ConvertFrom-Json
+          foreach ($k in 'name', 'version', 'type', 'main') {
+            if (-not $pkg.$k) { throw "package.json 缺字段 $k" }
+          }
+          if ($pkg.type -ne 'module') { throw 'type 必须是 module' }
+          if (-not $pkg.dsh.bundle.patch) { throw '缺 dsh.bundle.patch（宿主半侧挂不上）' }
+          if (-not $pkg.dsh.client) { throw '缺 dsh.client（浏览器半侧不会被发现）' }
+          if ($pkg.dsh.client.platform -ne 'web') { throw 'dsh.client.platform 必须是 web' }
+          $names = @($pkg.exports.PSObject.Properties.Name)
+          foreach ($k in '.', './client', './package.json') {
+            if ($names -notcontains $k) { throw "exports 缺 $k" }
+          }
+          Write-Host "package.json OK: $($pkg.name)@$($pkg.version)"
+
+      - name: 浏览器半侧的模块 id 标记
+        shell: pwsh
+        run: |
+          if (-not (Select-String -Path lib/client.js -Pattern '__PKG_ID__' -Quiet)) {
+            throw 'lib/client.js 缺 // __PKG_ID__ 标记：install.ps1 -Hot 换包名时靠它同步模块 id'
+          }
+          Write-Host '客户端 id 标记存在'
+
+      - name: 文档里的硬编码本机路径
+        shell: pwsh
+        run: |
+          $hits = Select-String -Path README.md, README.en.md, package.json -SimpleMatch -Pattern 'C:\Users\', 'D:\Agent-WorkPart' -ErrorAction SilentlyContinue
+          if ($hits) { throw ("文档里出现本机绝对路径: " + (($hits | ForEach-Object { $_.Filename }) -join ', ')) }
+          Write-Host '无本机路径泄漏'

@@ -1,0 +1,74 @@
+name: 🐛 Bug 反馈
+description: 播报不出声、设置页异常、安装失败等
+title: '[Bug] '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        先花 30 秒排除两个最常见原因：
+
+        1. **完全没声音** —— 打开 `$DSH_HOME/voice-notify.log`（默认 `C:\Users\<你>\.dsh\voice-notify.log`），
+           看每轮收尾是不是有一行 `PLAY`。`PLAY` 后面的秒数应≈音频时长，**明显偏短就是静默失败**（不是没触发）。
+        2. **设置页没有「语音提醒」这一栏** —— 装完要**刷新一次页面**，客户端模块清单是随首页一起注入的。
+
+  - type: input
+    id: plugin_version
+    attributes:
+      label: 插件版本
+      description: package.json 的 version，或 Release 的 tag
+      placeholder: '0.5.0'
+    validations:
+      required: true
+
+  - type: input
+    id: dsh_version
+    attributes:
+      label: DSH 版本
+      placeholder: '例如 1.x.x（宿主「设置 → 通用设置」里能看到）'
+    validations:
+      required: true
+
+  - type: input
+    id: windows
+    attributes:
+      label: Windows 版本
+      placeholder: 'winver 的结果，例如 Windows 11 23H2 (22631.4169)'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install_mode
+    attributes:
+      label: 安装方式
+      options:
+        - guardian 热挂载（install.ps1 默认）
+        - roster 名册（install.ps1 -Mode roster）
+        - 不确定
+    validations:
+      required: true
+
+  - type: textarea
+    id: what_happened
+    attributes:
+      label: 现象
+      description: 你期望发生什么、实际发生了什么
+    validations:
+      required: true
+
+  - type: textarea
+    id: log
+    attributes:
+      label: 播报日志尾部
+      description: 贴 `$DSH_HOME/voice-notify.log` 最后 20 行左右（有 PLAY/FAIL/MISS 的硬证据最好定位）
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 其他线索
+      description: 报错截图、控制台输出、是否改过 config.json / 换过语音目录等
+    validations:
+      required: false

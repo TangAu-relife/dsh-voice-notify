@@ -1,5 +1,11 @@
 # dsh-voice-notify
 
+[**简体中文**](README.md) | [English](README.en.md)
+
+[![check](https://github.com/TangAu-relife/dsh-voice-notify/actions/workflows/check.yml/badge.svg)](https://github.com/TangAu-relife/dsh-voice-notify/actions/workflows/check.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![platform: Windows](https://img.shields.io/badge/platform-Windows-0078d4.svg)](#安装)
+
 **一轮对话真正结束时，用中文语音播报一句提醒。**
 
 给 DSH 用的宿主侧（Host half）插件：挂宿主原生的「轮次收尾」扩展点，随机播一条
@@ -108,6 +114,8 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1 -Uninstall -Purge   # 连
 ---
 
 ## 设置页（图形界面）
+
+![设置页：固定语音的句子胶囊列表](docs/settings.png)
 
 插件带**浏览器半侧**：在 **设置页里单开一栏**（`settings.section` 插槽，导航名「语音提醒」）。
 

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 先看 README 的「诚实的边界」和「三个坑」
+    url: https://github.com/TangAu-relife/dsh-voice-notify/blob/main/README.md
+    about: 静默失败、音量、设置页空白、热更新不生效这类问题，README 里已写明原因和验证方法
