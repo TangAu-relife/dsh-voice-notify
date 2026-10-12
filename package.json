@@ -1,0 +1,45 @@
+{
+  "name": "dsh-voice-notify",
+  "version": "0.5.0",
+  "description": "任务完成语音提醒：一轮对话收尾时用中文语音播报。内置 20 条叠词语音（晓晓·温暖），并在设置页单开一栏（总开关 / 子代理轮次 / 最小间隔 / 固定语音 / 试听 / 播报日志）",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "voice",
+    "notify",
+    "tts"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "assets",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "license": "MIT"
+}

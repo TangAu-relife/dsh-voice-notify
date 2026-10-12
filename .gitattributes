@@ -1,0 +1,3 @@
+# 语音是二进制，别让 git 碰它
+*.wav binary
+*.png binary

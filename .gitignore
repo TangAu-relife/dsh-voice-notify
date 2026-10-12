@@ -1,0 +1,15 @@
+# 依赖（本插件运行时不需要 node_modules，安装是拷到 $DSH_HOME）
+node_modules/
+
+# 打包产物与日志
+*.zip
+*.log
+
+# 本机配置副本（真身在 $DSH_HOME\plugins\voice-notify\config.json）
+config.json
+deploy-*/
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
+desktop.ini

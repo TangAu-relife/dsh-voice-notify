@@ -1,0 +1,15 @@
+# ============================================================================
+# dsh-voice-notify —— DSH bundle patch
+# ============================================================================
+# 这是插件的"挂载声明"。DSH 启动时按 bundle 层栈叠加各插件 patch，
+# 本文件把语音提醒插件插入 profile 的配置树。
+#
+# 安装方式：
+#   dsh plugin --profile <name> add link:<本目录绝对路径>
+# 然后在 profile 的 package.json 里把 "dsh-voice-notify" 加进
+# dsh.profile.bundles，重启 DSH 生效。
+# ============================================================================
+
+- insert:
+    - id: dsh-voice-notify
+      name: dsh-voice-notify
